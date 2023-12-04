@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Code Generator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f2f2f2;
+      margin: 0;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .input-container {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+    }
+
+    #inputText {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .qr-code {
+      margin-top: 20px;
+    }
+
+    .download-buttons {
+      margin-top: 20px;
+    }
+
+    .download-button {
+      background-color: #008CBA;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
+
+    .download-button:hover {
+      background-color: #005682;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>QR Code Generator</h1>
+    <div class="input-container">
+      <label for="inputText">Enter text or URL:</label>
+      <input type="text" id="inputText" placeholder="Enter text or URL">
+    </div>
+    <button onclick="generateQRCode()">Generate QR Code</button>
+    <div id="qrCode" class="qr-code"></div>
+    <div class="download-buttons">
+      <button class="download-button" onclick="downloadQRCode('jpeg')">Download QR Code (JPEG)</button>
+      <button class="download-button" onclick="downloadQRCode('png')">Download QR Code (PNG)</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+  <script>
+    function generateQRCode() {
+      var inputText = document.getElementById('inputText').value;
+      var qrCodeContainer = document.getElementById('qrCode');
+
+      if (inputText !== '') {
+        qrCodeContainer.innerHTML = ''; // Clear previous QR code
+
+        var qrcode = new QRCode(qrCodeContainer, {
+          text: inputText,
+          width: 200,
+          height: 200
+        });
+      } else {
+        alert('Please enter text or URL.');
+      }
+    }
+
+    function downloadQRCode(format) {
+      var qrCodeContainer = document.getElementById('qrCode');
+      var svg = qrCodeContainer.querySelector('svg');
+      var svgData = new XMLSerializer().serializeToString(svg);
+      var image = new Image();
+
+      image.onload = function() {
+        var canvas = document.createElement('canvas');
+        canvas.width = image.width;
+        canvas.height = image.height;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(image, 0, 0);
+
+        var downloadLink = document.createElement('a');
+        downloadLink.download = 'qrcode.' + format;
+        downloadLink.href = canvas.toDataURL('image/' + format);
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+      };
+
+      image.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgData);
+    }
+  </script>
+</body>
+</html>
